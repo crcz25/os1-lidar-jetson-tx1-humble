@@ -1,0 +1,33 @@
+services:
+  ouster_lidar:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: full
+      args:
+        - AMENT_WORKSPACE_DIR=${AMENT_WORKSPACE_DIR}
+        - USERNAME=${USERNAME:-devuser}
+        - USER_UID=${UID:-1000}
+        - USER_GID=${UID:-1000}
+    container_name: ouster_container
+    runtime: nvidia
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+      - YOUR_IP=${YOUR_IP}
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - CYCLONEDDS_URI=${AMENT_WORKSPACE_DIR}/dds/cyclone.xml
+      - XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR
+      - NVIDIA_VISIBLE_DEVICES=all
+    devices:
+      - /dev/dri/card1:/dev/dri/card1
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    extra_hosts:
+      - "${OS_HN}:${OS_IP}"
+    network_mode: "host"
+    tty: true
+    volumes:
+      - ../dds:${AMENT_WORKSPACE_DIR}/dds
+      - /etc/localtime:/etc/localtime
+      - ../.vscode:${AMENT_WORKSPACE_DIR}/.vscode
+    working_dir: ${AMENT_WORKSPACE_DIR}
+    privileged: true
