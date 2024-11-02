@@ -38,6 +38,10 @@ This repository provides a Docker-based setup for using the OS1 LiDAR with the J
 ```bash
 docker-compose --progress plain -f ./docker/docker-compose.yml build
 ```
+- If you are building the image on a x86_64 machine, you need to install the `qemu-user-static` package to enable multi-architecture builds:
+```bash
+sudo apt-get install qemu-user-static
+```
 
 # 2. Start the Container
 - To start the container, run:
