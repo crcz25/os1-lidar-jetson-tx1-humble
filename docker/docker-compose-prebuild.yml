@@ -1,0 +1,11 @@
+services:
+  ouster_lidar:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: full
+      args:
+        - AMENT_WORKSPACE_DIR=${AMENT_WORKSPACE_DIR}
+        - USERNAME=${USERNAME:-devuser}
+        - USER_UID=${UID:-1000}
+        - USER_GID=${UID:-1000}
