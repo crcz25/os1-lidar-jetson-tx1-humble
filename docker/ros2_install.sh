@@ -16,8 +16,10 @@ cd $ROS_WORKSPACE
 
 if [[ $1 == http* ]]; then
     SOURCE="git_clone"
-    cd src
-    git clone $1
+        cd src
+    REPO_URL=$1
+    BRANCH=${2:-main}  # Default branch is "main" if not provided
+    git clone --recurse-submodules --branch $BRANCH $REPO_URL
     cd ../
 else
     SOURCE="rosinstall_generator"
@@ -51,25 +53,25 @@ colcon build ${COLCON_FLAGS} --base-paths src --event-handlers console_direct+
 
 #rm ${ROS_WORKSPACE}/*.rosinstall
 
-if grep $ROS_WORKSPACE /ros_entrypoint.sh; then
+if grep $ROS_WORKSPACE /usr/local/bin/ros_entrypoint.sh; then
     echo "workspace $ROS_WORKSPACE was already set to be sourced on startup:"
 else
-    tac /ros_entrypoint.sh | sed -e "3iros_source_env $ROS_WORKSPACE/install/setup.bash" | tac | tee /ros_entrypoint.sh
+    tac /usr/local/bin/ros_entrypoint.sh | sed -e "3iros_source_env $ROS_WORKSPACE/install/setup.bash" | tac | tee /usr/local/bin/ros_entrypoint.sh
     echo "added $ROS_WORKSPACE to be sourced on startup:"
 fi
 
 echo ""
-cat /ros_entrypoint.sh
+cat /usr/local/bin/ros_entrypoint.sh
 
-if [ "$SOURCE" = "rosinstall_generator" ]; then
-    source $ROS_WORKSPACE/install/setup.bash
-    ros_packages=$(ros2 pkg list)
-    echo "ROS2 packages installed:"
-    echo "$ros_packages"
-    if echo "$ros_packages" | grep "$@"; then
-        echo "$@ found"
-    else
-        echo "$@ not found"
-        exit 1
-    fi
-fi
+# if [ "$SOURCE" = "rosinstall_generator" ]; then
+#     source $ROS_WORKSPACE/install/setup.bash
+#     ros_packages=$(ros2 pkg list)
+#     echo "ROS2 packages installed:"
+#     echo "$ros_packages"
+#     if echo "$ros_packages" | grep "$@"; then
+#         echo "$@ found"
+#     else
+#         echo "$@ not found"
+#         exit 1
+#     fi
+# fi

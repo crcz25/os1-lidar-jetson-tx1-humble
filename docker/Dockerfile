@@ -1,7 +1,7 @@
 ##############
 # Base image #
 ##############
-FROM dustynv/ros:humble-desktop-pytorch-l4t-r35.4.1 as base
+FROM dustynv/ros:humble-desktop-pytorch-l4t-r35.4.1 AS base
 
 # Set the default shell to bash rather than sh
 ENV DEBIAN_FRONTEND=noninteractive
@@ -36,9 +36,14 @@ RUN ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
 ENV LANG=en_US.UTF-8
 
 # Install ROS2 packages from source
+COPY docker/ros_entrypoint.sh /usr/local/bin/ros_entrypoint.sh
+RUN sudo chmod +x /usr/local/bin/ros_entrypoint.sh
+
 COPY docker/ros2_install.sh /usr/local/bin/ros2_install.sh
 RUN sudo chmod +x /usr/local/bin/ros2_install.sh
-RUN /usr/local/bin/ros2_install.sh xacro
+
+RUN /usr/local/bin/ros2_install.sh https://github.com/ros-perception/perception_pcl.git ros2
+RUN /usr/local/bin/ros2_install.sh https://github.com/ouster-lidar/ouster-ros.git ros2
 
 # Install additional packages
 RUN apt-get update \
