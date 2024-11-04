@@ -124,7 +124,7 @@ RUN echo "alias src_ros='source /opt/ros/${ROS_DISTRO}/install/setup.bash'" >> /
 # Add completion of vcstool
 RUN echo "source /usr/share/vcstool-completion/vcs.bash" >> /home/$USERNAME/.bashrc
 # Add source of ROS
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /home/$USERNAME/.bashrc
+RUN echo "source /opt/ros/${ROS_DISTRO}/install/setup.bash" >> /home/$USERNAME/.bashrc
 # FIX setuptools for colcon
 RUN echo 'export PYTHONWARNINGS="ignore:setup.py install is deprecated::setuptools.command.install"' >> /home/$USERNAME/.bashrc
 # Build the workspace
