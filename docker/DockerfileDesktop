@@ -29,6 +29,7 @@ RUN apt-get update \
     # ros-${ROS_DISTRO}-gz-ros2-control \
     ros-${ROS_DISTRO}-urdf-launch \
     ros-${ROS_DISTRO}-imu-tools \
+    ros-${ROS_DISTRO}-rqt-topic \
     && rm -rf /var/lib/apt/lists/*
 
 #RUN apt-get update \
