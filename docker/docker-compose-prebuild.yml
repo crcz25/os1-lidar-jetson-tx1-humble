@@ -1,8 +1,10 @@
 services:
   ouster_lidar:
+    image: ouster_lidar_image:latest
+    platform: linux/arm64/v8
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/DockerfilePreBuild
       target: full
       args:
         - AMENT_WORKSPACE_DIR=${AMENT_WORKSPACE_DIR}

@@ -6,6 +6,8 @@ services:
     environment:
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
       - YOUR_IP=${YOUR_IP}
+      - JETSON_IP=${JETSON_IP}
+      - DESKTOP_IP=${DESKTOP_IP}
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       - CYCLONEDDS_URI=${AMENT_WORKSPACE_DIR}/dds/cyclone.xml
       - XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR
