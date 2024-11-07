@@ -1,11 +1,11 @@
 services:
   ouster_lidar:
-    image: ouster_lidar_image:latest
+    image: ros2_humble_jetson:latest
     container_name: ouster_container
     runtime: nvidia
     environment:
       - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
-      - YOUR_IP=XXX.XXX.XXX.XXX
+      - YOUR_IP=${JETSON_IP}
       - JETSON_IP=${JETSON_IP}
       - DESKTOP_IP=${DESKTOP_IP}
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp

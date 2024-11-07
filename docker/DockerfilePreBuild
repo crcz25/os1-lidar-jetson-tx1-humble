@@ -44,6 +44,7 @@ RUN sudo chmod +x /usr/local/bin/ros2_install.sh
 
 RUN /usr/local/bin/ros2_install.sh https://github.com/ros-perception/perception_pcl.git ros2
 RUN /usr/local/bin/ros2_install.sh https://github.com/ouster-lidar/ouster-ros.git ros2
+RUN /usr/local/bin/ros2_install.sh https://github.com/ros2/demos.git humble
 
 # Install additional packages
 RUN apt-get update \
