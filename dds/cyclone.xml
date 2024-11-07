@@ -1,39 +1,24 @@
-<!-- <CycloneDDS>
-  <Domain>
-    <Discovery>
-      <ParticipantIndex>auto</ParticipantIndex>
-      Static IPs due to de-activating multicast discovery
-      <Peers>
-        <Peer address="localhost"/>
-        <Peer address="${OS_IP}"/>
-      </Peers>
-    </Discovery>
-      <General>
-        <AllowMulticast>false</AllowMulticast>
-        <EnableMulticastLoopback>true</EnableMulticastLoopback>
-        <Interfaces>
-          <NetworkInterface address="${YOUR_IP}"/>
-        </Interfaces>
-        <Transport>default</Transport>
-      </General>
-  </Domain>
-</CycloneDDS> -->
-
 <CycloneDDS>
   <Domain>
     <General>
-      <AllowMulticast>false</AllowMulticast>
+      <AllowMulticast>true</AllowMulticast>
       <EnableMulticastLoopback>true</EnableMulticastLoopback>
-      <NetworkInterfaceAddress>${YOUR_IP}</NetworkInterfaceAddress>
+      <Interfaces>
+        <NetworkInterface address="${YOUR_IP}"/>
+      </Interfaces>
       <ExternalNetworkAddress>auto</ExternalNetworkAddress>
     </General>
     <Discovery>
       <ParticipantIndex>auto</ParticipantIndex>
       <Peers>
         <!-- Explicitly define IPs of both the Jetson and Desktop for direct discovery -->
-        <Peer address="JETSON_IP"/>
-        <Peer address="DESKTOP_IP"/>
+        <Peer address="${JETSON_IP}"/>
+        <Peer address="${DESKTOP_IP}"/>
       </Peers>
     </Discovery>
+    <Tracing>
+        <Verbosity>config</Verbosity>
+        <OutputFile>stdout</OutputFile>
+    </Tracing>
   </Domain>
 </CycloneDDS>
