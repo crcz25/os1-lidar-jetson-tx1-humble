@@ -31,23 +31,69 @@ This repository provides a Docker-based setup for using the OS1 LiDAR with the J
         docker info | grep -i runtime
         ```
 
-# Building and Running the Container
+# Building and Running the Containers
 
-# 1. Build the Docker Image
-- To build the Docker image, use:
-```bash
-docker-compose --progress plain -f ./docker/docker-compose.yml build
-```
-- If you are building the image on a x86_64 machine, you need to install the `qemu-user-static` package to enable multi-architecture builds:
-```bash
-sudo apt-get install qemu-user-static
-```
+## Configure the .env File
+- Set the following parameters in `docker/.env`:
+  - AMENT_WORKSPACE_DIR: ROS 2 workspace directory. Default is `/ament_ws`.
+  - ROS_DOMAIN_ID: ROS 2 network domain ID. Default is `10`.
+  - UID: Host machine user ID. Default is `1000`.
+  - GID: Host machine group ID. Default is `1000`.
+  - JETSON_IP: Jetson IP address. Default is `XXX.XXX.XXX.XXX`.
+  - DESKTOP_IP: Desktop machine IP address. Default is `XXX.XXX.XXX.XXX`.
+  - OS_HN: OS1 LiDAR hostname. Default is `os-XXXXXXXXXXXX.local`.
+  - OS_IP: OS1 LiDAR IP address. Default is `XXX.XXX.XXX.XXX`.
 
-# 2. Start the Container
-- To start the container, run:
-```bash
-docker-compose --progress plain -f ./docker/docker-compose.yml up
-```
+## Jetson Nano
+### 1. Build the Docker Image
+- Build the Docker image for the Jetson Nano with:
+  - On an x86_64 machine, run:
+      ```bash
+      docker compose --progress plain -f docker/docker-compose-prebuild.yml build
+      ```
+    - **Note**: If you’re building the image on an x86_64 machine, install `qemu-user-static` to enable multi-architecture builds:
+        ```bash
+        sudo apt-get install qemu-user-static
+        ```
+  - On a Jetson Nano, run (not tested):
+      ```bash
+      docker-compose --progress plain -f docker/docker-compose-prebuild.yml build
+    ```
+### 2. Move and load the image to the Jetson Nano:
+  - Save the image to a tar file:
+      ```bash
+      docker save -o ros2_humble_jetson.tar ros2_humble_jetson:latest
+      ```
+  - Transfer the tar file to the Jetson Nano:
+      ```bash
+      rsync -a -P \
+        ros2_humble_jetson.tar \
+        <jetson_user>@<jetson_ip>:<destination_path_on_jetson>
+      ```
+  - Load the image in the Jetson Nano:
+      ```bash
+      docker load -i <destination_path_on_jetson>/ros2_humble_jetson.tar
+      ```
+
+### 3. Start the Container
+- To start the container that runs in the Jetson, run:
+    ```bash
+    docker-compose --progress plain -f ./docker/docker-compose-jetson.yml up
+    ```
+
+## Desktop
+### 1. Build the Docker Image
+- Build the Docker image for the Desktop (used to run RViz and other tools unavailable on the Jetson) with:
+    ```bash
+    docker compose --progress plain -f docker/docker-compose-desktop.yml build
+    ```
+
+### 2. Start the Container
+- To start the container that runs in the Desktop, run:
+    ```bash
+    docker compose --progress plain -f docker/docker-compose-desktop.yml up
+    ```
+
 
 # Installing Custom ROS Packages
 This image is based on the [Jetson ROS containers](https://github.com/dusty-nv/jetson-containers/tree/master/packages/ros), which install ROS from source. To maintain compatibility, install additional ROS packages by building from source rather than using apt. Use the helper script provided:
@@ -63,35 +109,59 @@ Examples:
 ROS_WORKSPACE=/ros2_workspace /ros2_install.sh https://github.com/dusty-nv/ros_deep_learning
 ```
 
-# Configuring the Ouster LiDAR IP and Hostname
-1. Set up the `.env` file located in `docker/.env`.
-   - Define the IP and hostname for the Ouster LiDAR. The hostname should follow a convention with the device's serial number.
-        ```bash
-        OS_HN="os-XXXXXXXXXXXX.local"
-        OS_IP="XXX.XXX.XXX.XXX"
-        ```
-2. Verify the Setup within the container:
+# Testing the installation
+## Connect to a container
+- To access the bash inside any container use the following:
     ```bash
-        # Ping using hostname
-        devuser@devuser-jetson:/ament_ws$ ping -4 -c3 os-122144001514.local
-        PING os-122144001514.local (169.254.207.60) 56(84) bytes of data.
-        64 bytes from os-122144001514.local (169.254.207.60): icmp_seq=1 ttl=64 time=0.622 ms
-        64 bytes from os-122144001514.local (169.254.207.60): icmp_seq=2 ttl=64 time=0.182 ms
-        64 bytes from os-122144001514.local (169.254.207.60): icmp_seq=3 ttl=64 time=0.239 ms
+    docker exec -it <container_name> bash
+    ```
 
-        --- os-122144001514.local ping statistics ---
-        3 packets transmitted, 3 received, 0% packet loss, time 2052ms
-        rtt min/avg/max/mdev = 0.182/0.347/0.622/0.195 ms
+## Listener/Talker demo
+To verify the installation, it’s recommended to test communication using the talker and listener nodes from the demo_nodes_cpp package.
+- Inside any of the containers, make sure to source the ROS 2 environment:
+    ```bash
+    source /opt/ros/humble/setup.bash
+    ```
+- In one container, start the `talker` node:
+    ```bash
+    ros2 run demo_nodes_cpp talker
+    ```
+- In the other container, start the `listener` node:
+    ```bash
+    ros2 run demo_nodes_cpp listener
+    ```
+- You should see the `listener` node printing messages published by the `talker` node. In any direction, either from the Jetson to the Desktop or vice versa, the nodes should communicate successfully. For debugging purposes, CycloneDDS is configured to print debug messages to the console by default. To disable this, simply comment out the `<Tracing>` tag in the CycloneDDS configuration file located at `dds/cyclone.xml`.
 
-        # Ping using IP
-        PING 169.254.207.60 (169.254.207.60) 56(84) bytes of data.
-        64 bytes from 169.254.207.60: icmp_seq=1 ttl=64 time=0.545 ms
-        64 bytes from 169.254.207.60: icmp_seq=2 ttl=64 time=0.330 ms
-        64 bytes from 169.254.207.60: icmp_seq=3 ttl=64 time=0.190 ms
-
-        --- 169.254.207.60 ping statistics ---
-        3 packets transmitted, 3 received, 0% packet loss, time 2042ms
-        rtt min/avg/max/mdev = 0.190/0.355/0.545/0.146 ms
+## OS1 LiDAR Test
+- In the Jetson container, start the Ouster ROS driver by running the following command:
+    ```bash
+    ros2 launch ouster_ros driver.launch.py \
+    params_file:=src/ouster_config.yaml \
+    viz:=false
+    ```
+This command launches the Ouster driver node, configured with the parameters specified in `src/ouster_config.yaml`. The `viz:=false` option disables built-in visualization.
+- On the desktop container, you can either:
+  - Launch RViz to visualize LiDAR data, or list available ROS 2 topics to confirm the LiDAR driver is publishing data.
+  - To list available topics, run:
+    ```bash
+    ros2 topic list
+    ```
+    Example output:
+    ```bash
+    /ouster/imu
+    /ouster/imu_packets
+    /ouster/lidar_packets
+    /ouster/metadata
+    /ouster/nearir_image
+    /ouster/os_driver/transition_event
+    /ouster/points
+    /ouster/range_image
+    /ouster/reflec_image
+    /ouster/scan
+    /ouster/signal_image
+    /parameter_events
+    /rosout
+    /tf_static
     ```
 
 # References
