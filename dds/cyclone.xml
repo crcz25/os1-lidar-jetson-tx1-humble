@@ -1,0 +1,24 @@
+<CycloneDDS>
+  <Domain>
+    <General>
+      <AllowMulticast>true</AllowMulticast>
+      <EnableMulticastLoopback>true</EnableMulticastLoopback>
+      <Interfaces>
+        <NetworkInterface address="${YOUR_IP}"/>
+      </Interfaces>
+      <ExternalNetworkAddress>auto</ExternalNetworkAddress>
+    </General>
+    <Discovery>
+      <ParticipantIndex>auto</ParticipantIndex>
+      <Peers>
+        <!-- Explicitly define IPs of both the Jetson and Desktop for direct discovery -->
+        <Peer address="${JETSON_IP}"/>
+        <Peer address="${DESKTOP_IP}"/>
+      </Peers>
+    </Discovery>
+    <Tracing>
+        <Verbosity>config</Verbosity>
+        <OutputFile>stdout</OutputFile>
+    </Tracing>
+  </Domain>
+</CycloneDDS>

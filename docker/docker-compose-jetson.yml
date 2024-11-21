@@ -1,0 +1,29 @@
+services:
+  ouster_lidar:
+    image: ros2_humble_jetson:latest
+    container_name: ouster_container
+    runtime: nvidia
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+      - YOUR_IP=${JETSON_IP}
+      - JETSON_IP=${JETSON_IP}
+      - DESKTOP_IP=${DESKTOP_IP}
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - CYCLONEDDS_URI=${AMENT_WORKSPACE_DIR}/dds/cyclone.xml
+      - XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - USERNAME=${USERNAME:-devuser}
+      - USER_UID=${UID:-1000}
+      - USER_GID=${UID:-1000}
+    extra_hosts:
+      - "${OS_HN}:${OS_IP}"
+    network_mode: "host"
+    tty: true
+    volumes:
+      - ../dds:${AMENT_WORKSPACE_DIR}/dds
+      - /etc/localtime:/etc/localtime
+      - ../.vscode:${AMENT_WORKSPACE_DIR}/.vscode
+      - ../src:${AMENT_WORKSPACE_DIR}/src
+    working_dir: ${AMENT_WORKSPACE_DIR}
+    privileged: true

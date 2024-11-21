@@ -1,0 +1,37 @@
+services:
+  ros_humble_desktop:
+    build:
+      context: ..
+      dockerfile: docker/DockerfileDesktop
+      target: full
+      args:
+        - AMENT_WORKSPACE_DIR=${AMENT_WORKSPACE_DIR}
+        - USERNAME=${USERNAME:-devuser}
+        - USER_UID=${UID:-1000}
+        - USER_GID=${UID:-1000}
+    container_name: ros2_desktop
+    network_mode: host
+    tty: true
+    stdin_open: true
+    environment:
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+      - YOUR_IP=${DESKTOP_IP}
+      - JETSON_IP=${JETSON_IP}
+      - DESKTOP_IP=${DESKTOP_IP}
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      - CYCLONEDDS_URI=${AMENT_WORKSPACE_DIR}/dds/cyclone.xml
+      - DISPLAY
+      - QT_X11_NO_MITSHM=1
+      - XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR
+    devices:
+      - /dev/dri
+    extra_hosts:
+      - "${OS_HN}:${OS_IP}"
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime
+      - ../dds:${AMENT_WORKSPACE_DIR}/dds
+      - ../.vscode:${AMENT_WORKSPACE_DIR}/.vscode
+      - ../src:${AMENT_WORKSPACE_DIR}/src
+    working_dir: ${AMENT_WORKSPACE_DIR}
+    privileged: true
