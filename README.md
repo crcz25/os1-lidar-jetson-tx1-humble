@@ -1,6 +1,25 @@
 # OS1 LiDAR Setup on Jetson TX1/Nano with ROS 2 Humble in Docker
 This repository provides a Docker-based setup for using the OS1 LiDAR with the Jetson TX1/Nano platform running ROS 2 Humble.
 
+# Directory Structure
+- `dds/`: Contains configuration files for CycloneDDS.
+  - `cyclone.xml`: Configuration file for Cyclone DDS.
+- `docker/`: Contains Docker-related files and configurations.
+  - `.env`: Environment variables for Docker Compose.
+  - `docker-compose-desktop.yml`: Docker Compose file for setting up the desktop environment.
+  - `docker-compose-jetson.yml`: Docker Compose file for setting up the Jetson environment.
+  - `docker-compose-prebuild.yml`: Docker Compose file for prebuilding the Docker image (Jetson).
+  - `DockerfileDesktop`: Dockerfile for building the desktop Docker image.
+  - `DockerfilePreBuild`: Dockerfile for prebuilding the Docker image (Jetson).
+  - `entrypoint.sh`: Entrypoint script for Docker containers.
+  - `ros_entrypoint.sh`: ROS entrypoint script for Docker containers.
+  - `ros2_install.sh`: Script to install ROS 2 packages from source.
+- `docker-images/`: Directory for storing Docker images.
+- `src/`: Source directory (for the workspace to be mounted in the container) containing the packages and configuration files. You should place your ROS2 packages here.
+  - `ouster_config.yaml`: Configuration file for the Ouster LiDAR.
+  - `ros2.repos`: List of repositories to use within the ROS 2 workspace.
+- `repos_to_submodules.py`: Script to convert repositories (from *.repo files) to Git submodules.
+
 # Prerequisites
 1. Install Docker Compose
    - Follow the official [Docker Compose installation instructions](https://docs.docker.com/compose/install/standalone/), making sure to use the aarch64 version for ARM-based Jetson devices.
