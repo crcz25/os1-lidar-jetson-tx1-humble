@@ -13,6 +13,10 @@
 #    colcon build --symlink-install --cmake-args '-DCMAKE_BUILD_TYPE=Release' -Wall -Wextra -Wpedantic
 #fi
 
+# TODO: Is this really needed?
+# Change permissions of workspace
+sudo chown -R $USER:$USER /ament_ws
+
 # Print out the arguments passed to the container
 echo "Provided arguments: $@"
 # Execute the command passed to the container
